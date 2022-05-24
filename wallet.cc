@@ -18,6 +18,11 @@
 
 #include <stdint.h>
 
+#include "absl/flags/declare.h"
+#include "absl/flags/flag.h"
+
+ABSL_DECLARE_FLAG(std::string, server);
+
 #include "absl/strings/escaping.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/string_view.h"
@@ -867,7 +872,8 @@ std::vector<std::pair<WalletSecret, int>> Wallet::ReplaceWebcash(absl::Time time
     replace.push_back(std::make_pair("legalese", legalese));
 
     // Submit replacement
-    httplib::Client cli("https://webcash.tech");
+    const std::string server = absl::GetFlag(FLAGS_server);
+    httplib::Client cli(server);
     cli.set_read_timeout(60, 0); // 60 seconds
     cli.set_write_timeout(60, 0); // 60 seconds
     auto r = cli.Post(
